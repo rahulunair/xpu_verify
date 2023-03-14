@@ -1,6 +1,6 @@
 ## Intel GPU sanity tests
 
-### Quickly verify your machine:
+### Oneliner:
 
 ```bash
 git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && sudo ./check_all.sh
