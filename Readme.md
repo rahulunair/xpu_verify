@@ -146,6 +146,7 @@ Platform: Intel(R) Level-Zero
 	Device: Intel(R) Graphics [0x5693]
 	Device: Intel(R) Graphics [0x46a6]
 compile and execute sycl programs on the device
+```
 
 5. To check if PyTorch workloads can be run using the GPU (xpu device):
 
