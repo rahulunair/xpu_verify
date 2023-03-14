@@ -4,6 +4,7 @@
 
 ```bash
 git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && sudo ./check_all.sh
+```
 
 These tests can be used to see if Intel discrete GPUs have been properly set up on Linux. The following checks can be performed:
 
