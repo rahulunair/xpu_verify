@@ -1,5 +1,10 @@
 ## Intel GPU sanity tests
 
+### Quickly verify your machine:
+
+```bash
+git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && sudo ./check_all.sh
+
 These tests can be used to see if Intel discrete GPUs have been properly set up on Linux. The following checks can be performed:
 
 - Linux Kernel i915 module loaded and Graphics microcode for the the GPU loaded
@@ -13,7 +18,7 @@ These tests can be used to see if Intel discrete GPUs have been properly set up 
 1. Verify if the Linux kernel and i915 drivers are in place:
 
 ```bash
-└❯ ./check_all.sh 
+└❯ ./check_device.sh 
 ```
 Output:
 
