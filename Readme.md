@@ -1,5 +1,9 @@
 ## Intel GPU sanity tests
 
+### Supported OSes
+
+- Ubuntu variants (20.04 and 22.04)
+- RHEL variants, Fedora
 
 ### Requirements
 
