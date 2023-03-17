@@ -15,7 +15,7 @@ and for RHEL, SUSE, and other similar systems, please check out this [link](http
 ### Oneliner:
 
 ```bash
-git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && sudo ./check_all.sh
+git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && ./check_all.sh
 ```
 
 These tests can be used to see if Intel discrete GPUs have been properly set up on Linux. The following checks can be performed:
