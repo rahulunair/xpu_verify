@@ -32,8 +32,8 @@ fi
 
 echo ""
 echo "Checking if appropriate graphics microcode is loaded in i915"
-if sudo dmesg | grep -i i915 -A20  | grep -i "guc" | grep -iE "dg2_guc_|pvc_guc_" > /dev/null ; then
-    guc=$(sudo dmesg | grep -i i915 -A20 | grep -i "guc" | grep -iE "dg2_guc_|pvc_guc_" | cut -d "/" -f 2)
+if sudo dmesg | grep -i i915 -A20  | grep -i "guc" | grep -iE "dg2_guc_|pvc_guc_|xehpsdv_guc" > /dev/null ; then
+    guc=$(sudo dmesg | grep -i i915 -A20 | grep -i "guc" | grep -iE "dg2_guc_|pvc_guc_|xehpsdv_guc" | cut -d "/" -f 2)
     echo "Discrete GPU GuC loaded with firmware version: $guc"
 else
     echo "Discrete GPU GUC not loaded"
