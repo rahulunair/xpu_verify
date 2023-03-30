@@ -1,0 +1,41 @@
+name: GPU Driver Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  gpu-driver-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install sshpass
+      run: |
+        sudo -E apt-get update
+        sudo -E apt-get install -y sshpass
+
+    - name: Run GPU driver test script on server
+      env:
+        PRIVATE_KEY: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SERVER_SUDO_PASSWORD: ${{ secrets.SERVER_SUDO_PASSWORD }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SERVER_USER@$SERVER_IP "echo '$SERVER_SUDO_PASSWORD' | sudo -S apt-get update && sudo -S apt-get install -y docker.io"
+        ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SERVER_USER@$SERVER_IP "echo '$SERVER_SUDO_PASSWORD' | sudo -S systemctl enable docker && sudo -S systemctl start docker"
+        ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SERVER_USER@$SERVER_IP "echo '$SERVER_SUDO_PASSWORD' | sudo -S usermod -aG docker $SERVER_USER"
+        ssh -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SERVER_USER@$SERVER_IP "echo '$SERVER_SUDO_PASSWORD' | sshpass -p '$SERVER_SUDO_PASSWORD' sudo -S git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && ./check_all.sh | tee output.txt"
+        scp -i private_key.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q $SERVER_USER@$SERVER_IP:~/intel_gpu_tests/output.txt .
+    
+    - name: Upload output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: gpu-driver-test-output
+        path: output.txt

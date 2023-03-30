@@ -117,3 +117,8 @@ function check_os_drivers() {
 
 echo "Detected operating system: $os_name $os_version"
 check_os_drivers
+if [[ "${#missing_drivers[@]}" -eq 0 ]]; then
+    exit 0
+else
+    exit 1
+fi

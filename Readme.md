@@ -1,390 +1,150 @@
-## Intel GPU sanity tests
+# Intel GPU Sanity Tests
 
-### Supported OSes
+'xpu-verify' tool provides a comprehensive set of tests and automated fixes to help ensure that Intel discrete GPUs have been correctly set up on Linux systems. The tool supports various distributions, such as Ubuntu (20.04 and 22.04), RHEL, and Fedora.
 
-- Ubuntu variants (20.04 and 22.04)
-- RHEL variants, Fedora
+## Table of Contents
 
-### Requirements
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Check System Setup](#check-system-setup)
+  - [Fix System Setup](#fix-system-scripts)
+  - [Check and Fix System Setup](#combined-test-and-fix)
+  - [AI Libraries Installation](#ai-libraries-installation)
+- [Supported Tests](#supported-tests)
+- [Additional Checks](#additional-checks)
 
-- To set up the kernel, compute drivers, and other necessary components for Intel discrete GPUs, please refer to the [Intel GPU documentation](https://dgpu-docs.intel.com/installation-guides/index.html).
-- If you plan on running SYCL tests, you will need to install the intel-oneapi-compiler-dpcpp-cpp package, which includes the oneAPI compiler.If you've set up the Intel oneAPI repository on your machine, you can easily install the package using your operating system's package manager. For Ubuntu, please refer to this [link](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/apt.html),
-and for RHEL, SUSE, and other similar systems, please check out this [link](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/yum-dnf-zypper.html).
-- Additionally, to run AI tests, it is required to install Docker.
+## Prerequisites
 
-### Oneliner:
+- Ensure that the kernel, compute drivers, and other necessary components for Intel discrete GPUs have been set up according to the [Intel GPU documentation](https://dgpu-docs.intel.com/installation-guides/index.html).
+- To run SYCL tests, install the `intel-oneapi-compiler-dpcpp-cpp` package, which includes the oneAPI compiler. For installation instructions on Ubuntu, refer to this [link](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/apt.html), and for RHEL, SUSE, and other similar systems, refer to this [link](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/yum-dnf-zypper.html).
+- To run AI tests, Docker is required.
 
-```bash
-git clone https://github.com/unrahul/intel_gpu_tests && cd intel_gpu_tests && ./check_all.sh
-```
+## Installation
 
-These tests can be used to see if Intel discrete GPUs have been properly set up on Linux. The following checks can be performed:
-
-- Linux Kernel i915 module loaded and Graphics microcode for the the GPU loaded
-- Compute drivers are installed
-- `sycl-ls` can list the GPU devices for opencl and level-zero backend  # oneapi basekit required
-- `sycl` programs can be compiled using icpx # oneapi basekit required
-- PyTorch and TensorFlow can detect XPU device and can run workloads using the device.  # docker required
-
-### How to Use?
-
-1. Verify if the Linux kernel and i915 drivers are in place:
+Clone the Intel GPU sanity tests repository and navigate to the directory:
 
 ```bash
-└❯ ./check_device.sh 
+└❯ git clone https://github.com/unrahul/xpu_verify && cd xpu_verify
 ```
-Output:
+
+### Usage
+
+#### Checking System Setup
+
+To check if the system is set up correctly for Intel discrete GPUs, run the script with the -c option:
 
 ```bash
-check kernel and i915 config
-===================================================
-Checking kernel configuration for intel discrete GPUs
-====================================================
-Checking if i915 kernel module is loaded...
-i915 kernel module is loaded
+└❯ ./xpu_verify.sh -c
+```
+#### Fix System Setup
 
-Checking if the user is in render group...
-User is in render group
+To fix and augment the system setup with essential tools and libraries for Intel discrete GPUs, run the script with the -f option:
 
-Checking if Intel discrete GPU is visible as a pcie device...
-Intel discrete GPU is visible
-
-Checking if appropriate graphics microcode is loaded in i915
-[sudo] password for runnikri: 
-Discrete GPU GuC loaded with firmware version: dg2_guc_70.bin version 70.5.1
-====================================================
+```bash
+└❯ ./xpu_verify.sh -f
 ```
 
-2. To check if compute drivers are loaded (Ubuntu and Rhel):
+#### Check and Fix System Setup
+
+To check and fix the system setup for Intel discrete GPUs, run the script with the -p option:
+
+```bash
+└❯ ./xpu_verify.sh -p
+```
+
+#### AI Libraries Installation
+
+To install specific AI packages with XPU support (e.g., openvino_xpu, pytorch_xpu, tensorflow_xpu, ai_xpu), run:
+
+```
+└❯ ./xpu_verify.sh -i pkg1, pkg2,...
+```
+
+## Supported Tests
+
+The following tests can be performed:
+
+##### Linux Kernel i915 Module and Graphics Microcode
+
+This test checks if the Linux Kernel i915 module is loaded and the Graphics microcode for the GPU is loaded.
+
+```bash
+└❯ ./check_device.sh
+```
+
+##### Check OS kernel and version
+
+```bash
+└❯ ./check_os_kernel.sh
+```
+
+##### Compute Drivers
+
+This test checks if the necessary intel compute drivers are installed.
 
 ```bash
 └❯ ./check_compute_drivers.sh
 ```
-Output:
+
+##### GPU Devices Listing
+
+This test verifies if sycl-ls can list the GPU devices for OpenCL and Level-Zero backends. The oneAPI basekit is required for this test.
 
 ```bash
-check for compute drivers
-===================================================
-Detected operating system: ubuntu 22.04
-Checking for required drivers on Ubuntu 22.04 ...
-All required drivers are installed.
-============================================
-The following compute drivers are installed:
-intel-level-zero-gpu (1.3.25018.23+i554~22.04)
-intel-opencl-icd (22.49.25018.23+i554~22.04)
-level-zero (1.8.8+i524~u22.04)
-level-zero-dev (1.8.8+i524~u22.04)
-libdrm-common (2.4.112.3+2048~u22.04)
-libdrm2 (2.4.112.3+2048~u22.04)
-libdrm-amdgpu1 (2.4.112.3+2048~u22.04)
-libdrm-intel1 (2.4.112.3+2048~u22.04)
-libdrm-nouveau2 (2.4.112.3+2048~u22.04)
-libdrm-dev (2.4.112.3+2048~u22.04)
-libigc1 (1.0.12812.24+i554~22.04)
-libigdfcl1 (1.0.12812.24+i554~22.04)
-libigdgmm12 (22.3.3+i550~22.04)
-============================================
+└❯ ./syclls.sh --force
 ```
 
-3. To  check if sycl-ls can list GPU devices:
+##### Check if Intel basekit is installed
 
 ```bash
-└❯ ./check_syclls.sh
+└❯ ./check_intel_basekit.sh
 ```
 
-Output:
+##### SYCL Programs Compilation
+
+This test checks if sycl programs can be compiled using icpx. The oneAPI basekit is required for this test.
 
 ```bash
-check if syclls can list the gpu devices
-===================================================
-Available sycl GPU devices:
-[ext_oneapi_level_zero:gpu:0] Intel(R) Level-Zero, Intel(R) Graphics [0x5693] 1.3 [1.3.25018]
-[ext_oneapi_level_zero:gpu:1] Intel(R) Level-Zero, Intel(R) Graphics [0x46a6] 1.3 [1.3.25018]
+└❯ ./check_sycl.sh
 ```
 
-4. To check if sycl programs can be compiled and run using intel compiler `icpx`:
+##### Check scaling governer
 
 ```bash
-└❯./check_sycl.sh
+└❯ ./scaling_governor.sh
 ```
 
-Output:
+##### PyTorch and TensorFlow XPU Device Detection
+
+This test checks if PyTorch and TensorFlow can detect the XPU device and run workloads using the device. Docker is required for this test.
+
+For PyTorch:
 
 ```bash
-compile and execute sycl programs on the device
-===================================================
-icpx is in the environment
-./device_info
-Device name: Intel(R) Graphics [0x5693]
-Device memory: 3.75547 GB
-Device max compute units: 128
-Device max work-group size: 1024
-./add_nums
-sum 30 random numbers using device: Intel(R) Graphics [0x5693]
-15 + 19 = 34
-5 + 15 = 20
-8 + 13 = 21
-1 + 16 = 17
-..
-..
-11 + 18 = 29
-./enum_devices
-Platform: Intel(R) FPGA Emulation Platform for OpenCL(TM)
-	Device: Intel(R) FPGA Emulation Device
-Platform: Intel(R) OpenCL
-	Device: 12th Gen Intel(R) Core(TM) i7-12700H
-Platform: Intel(R) OpenCL HD Graphics
-	Device: Intel(R) Graphics [0x5693]
-Platform: Intel(R) OpenCL HD Graphics
-	Device: Intel(R) Graphics [0x46a6]
-Platform: Intel(R) Level-Zero
-	Device: Intel(R) Graphics [0x5693]
-	Device: Intel(R) Graphics [0x46a6]
-compile and execute sycl programs on the device
+└❯ ./check_pytorch.sh
 ```
-
-5. To check if PyTorch workloads can be run using the GPU (xpu device):
-
+For TensorFlow:
 
 ```bash
-└❯./check_pytorch.sh
+└❯ ./check_tensorflow.sh
 ```
 
-Output:
+##### Additional Checks
+
+Check if network proxy is setup, print the proxy, remove proxy settings and restore proxy settings:
 
 ```bash
-check if PyTorch can see the GPU (XPU) device
-===================================================
-PyTorch test
-pulling PyTorch docker image...
-gpu: Pulling from intel/intel-optimized-pytorch
-Digest: sha256:4d4b06040e9ee8ca4e5055142514b91506cf23880a630f8a912bb58ef61d016e
-Status: Image is up to date for intel/intel-optimized-pytorch:gpu
-docker.io/intel/intel-optimized-pytorch:gpu
-INFO:__main__:Intel XPU device is available
-INFO:__main__:Device name: Intel(R) Graphics [0x5693]
-WARNING:__main__:Native FP64 type not supported on this platform
-INFO:__main__:Random FP16 multiplication:
-INFO:__main__:  Input x: tensor([[0.8823]], dtype=torch.float16)
-INFO:__main__:  Input y: tensor([[0.9150]], dtype=torch.float16)
-INFO:__main__:  Output z: tensor([[0.8071]], dtype=torch.float16)
-INFO:__main__:Check if multiplication with two tensors gives expected value
-INFO:__main__:Specific FP16 multiplication:
-INFO:__main__:  Input x: tensor([[1., 2.]], dtype=torch.float16)
-INFO:__main__:  Input y: tensor([[3., 4.]], dtype=torch.float16)
-INFO:__main__:  Output z: tensor([[3., 8.]], dtype=torch.float16)
-INFO:__main__:Calculation is correct
-INFO:__main__:XPU tests successful!
+└❯ ./proxy_helper.sh
 
-===================================================
-```
+## Contributing
 
-6. To check if TensorFlow workloads can be run using the GPU (xpu device):
+Contributions to improve and expand the Intel GPU sanity tests are welcome. If you are interested in contributing, please consider the following areas:
 
-```bash
-└❯./check_tesorflow.sh
-```
+1. **Adding more tests**: Continuously improving the coverage of tests is valuable. If you have a specific test or benchmark in mind that would help validate the Intel discrete GPU setup, feel free to create a new script and submit a pull request.
 
-Output:
+2. **Bug fixes and improvements**: If you find any bugs or areas where the existing tests can be improved, please report the issue or submit a pull request with your proposed changes.
 
-```bash
-check if TensorFlow can see the GPU (XPU) device
-===================================================
-pulling TensorFlow docker image...
-gpu-flex: Pulling from intel/intel-extension-for-tensorflow
-Digest: sha256:c2a0ee126befd3b2f5dca78cce3c6f19c6cf0f60d7b4ed615b48efcbfa0198e9
-Status: Image is up to date for intel/intel-extension-for-tensorflow:gpu-flex
-docker.io/intel/intel-extension-for-tensorflow:gpu-flex
-2023-03-14 01:14:41.101399: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX_VNNI FMA
-To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2023-03-14 01:14:41.222203: I tensorflow/core/util/port.cc:104] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-2023-03-14 01:14:41.225826: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /opt/intel/oneapi/lib:/opt/intel/oneapi/lib/intel64:
-2023-03-14 01:14:42.975450: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:272] Created TensorFlow device (/device:XPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: XPU, pci bus id: <undefined>)
-2023-03-14 01:14:42.975773: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:272] Created TensorFlow device (/device:XPU:1 with 0 MB memory) -> physical PluggableDevice (device: 1, name: XPU, pci bus id: <undefined>)
-[name: "/device:CPU:0"
-device_type: "CPU"
-memory_limit: 268435456
-locality {
-}
-incarnation: 17404753498867757733
-xla_global_id: -1
-, name: "/device:XPU:0"
-device_type: "XPU"
-locality {
-  bus_id: 1
-}
-incarnation: 14973945165464988944
-physical_device_desc: "device: 0, name: XPU, pci bus id: <undefined>"
-xla_global_id: -1
-, name: "/device:XPU:1"
-device_type: "XPU"
-locality {
-  bus_id: 1
-}
-incarnation: 8102261655652644080
-physical_device_desc: "device: 1, name: XPU, pci bus id: <undefined>"
-xla_global_id: -1
-]
-XPU test successful!
+3. **Platform support**: The goal is to support a wide range of Linux distributions and kernel versions. If you have experience with a specific distribution and would like to ensure the tests work correctly on it, your help would be appreciated.
 
-===================================================
-```
-
-7. To run all tests:
-
-```bash
- |base|💁  unrahul @ 💻  minicle in 📁  intel_gpu_tests on 🌿  main ✓
-└❯ ./check_all.sh 
-```
-
-Output:
-
-```bash
-
-check kernel and i915 config
-===================================================
-Checking kernel configuration for intel discrete GPUs
-====================================================
-Checking if i915 kernel module is loaded...
-i915 kernel module is loaded
-
-Checking if the user is in render group...
-User is in render group
-
-Checking if Intel discrete GPU is visible as a pcie device...
-Intel discrete GPU is visible
-
-Checking if appropriate graphics microcode is loaded in i915
-[sudo] password for runnikri: 
-Discrete GPU GuC loaded with firmware version: dg2_guc_70.bin version 70.5.1
-====================================================
-
-
-check for compute drivers
-===================================================
-Detected operating system: ubuntu 22.04
-Checking for required drivers on Ubuntu 22.04 ...
-All required drivers are installed.
-============================================
-The following compute drivers are installed:
-intel-level-zero-gpu (1.3.25018.23+i554~22.04)
-intel-opencl-icd (22.49.25018.23+i554~22.04)
-level-zero (1.8.8+i524~u22.04)
-level-zero-dev (1.8.8+i524~u22.04)
-libdrm-common (2.4.112.3+2048~u22.04)
-libdrm2 (2.4.112.3+2048~u22.04)
-libdrm-amdgpu1 (2.4.112.3+2048~u22.04)
-libdrm-intel1 (2.4.112.3+2048~u22.04)
-libdrm-nouveau2 (2.4.112.3+2048~u22.04)
-libdrm-dev (2.4.112.3+2048~u22.04)
-libigc1 (1.0.12812.24+i554~22.04)
-libigdfcl1 (1.0.12812.24+i554~22.04)
-libigdgmm12 (22.3.3+i550~22.04)
-============================================
-
-check if syclls can list the gpu devices
-===================================================
-Available sycl GPU devices:
-[ext_oneapi_level_zero:gpu:0] Intel(R) Level-Zero, Intel(R) Graphics [0x5693] 1.3 [1.3.25018]
-[ext_oneapi_level_zero:gpu:1] Intel(R) Level-Zero, Intel(R) Graphics [0x46a6] 1.3 [1.3.25018]
-
-compile and execute sycl programs on the device
-===================================================
-icpx is in the environment
-./device_info
-Device name: Intel(R) Graphics [0x5693]
-Device memory: 3.75547 GB
-Device max compute units: 128
-Device max work-group size: 1024
-./add_nums
-sum 30 random numbers using device: Intel(R) Graphics [0x5693]
-15 + 19 = 34
-5 + 15 = 20
-8 + 13 = 21
-17 + 9 = 26
-13 + 8 = 21
-...
-...
-./enum_devices
-Platform: Intel(R) FPGA Emulation Platform for OpenCL(TM)
-	Device: Intel(R) FPGA Emulation Device
-Platform: Intel(R) OpenCL
-	Device: 12th Gen Intel(R) Core(TM) i7-12700H
-Platform: Intel(R) OpenCL HD Graphics
-	Device: Intel(R) Graphics [0x5693]
-Platform: Intel(R) OpenCL HD Graphics
-	Device: Intel(R) Graphics [0x46a6]
-Platform: Intel(R) Level-Zero
-	Device: Intel(R) Graphics [0x5693]
-	Device: Intel(R) Graphics [0x46a6]
-compile and execute sycl programs on the device
-
-check if PyTorch can see the GPU (XPU) device
-===================================================
-PyTorch test
-pulling PyTorch docker image...
-gpu: Pulling from intel/intel-optimized-pytorch
-Digest: sha256:4d4b06040e9ee8ca4e5055142514b91506cf23880a630f8a912bb58ef61d016e
-Status: Image is up to date for intel/intel-optimized-pytorch:gpu
-docker.io/intel/intel-optimized-pytorch:gpu
-INFO:__main__:Intel XPU device is available
-INFO:__main__:Device name: Intel(R) Graphics [0x5693]
-WARNING:__main__:Native FP64 type not supported on this platform
-INFO:__main__:Random FP16 multiplication:
-INFO:__main__:  Input x: tensor([[0.8823]], dtype=torch.float16)
-INFO:__main__:  Input y: tensor([[0.9150]], dtype=torch.float16)
-INFO:__main__:  Output z: tensor([[0.8071]], dtype=torch.float16)
-INFO:__main__:Check if multiplication with two tensors gives expected value
-INFO:__main__:Specific FP16 multiplication:
-INFO:__main__:  Input x: tensor([[1., 2.]], dtype=torch.float16)
-INFO:__main__:  Input y: tensor([[3., 4.]], dtype=torch.float16)
-INFO:__main__:  Output z: tensor([[3., 8.]], dtype=torch.float16)
-INFO:__main__:Calculation is correct
-INFO:__main__:XPU tests successful!
-
-===================================================
-
-check if TensorFlow can see the GPU (XPU) device
-===================================================
-pulling TensorFlow docker image...
-gpu-flex: Pulling from intel/intel-extension-for-tensorflow
-Digest: sha256:c2a0ee126befd3b2f5dca78cce3c6f19c6cf0f60d7b4ed615b48efcbfa0198e9
-Status: Image is up to date for intel/intel-extension-for-tensorflow:gpu-flex
-docker.io/intel/intel-extension-for-tensorflow:gpu-flex
-2023-03-14 01:14:41.101399: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX_VNNI FMA
-...
-...
-2023-03-14 01:14:42.975426: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:306] Could not identify NUMA node of platform XPU ID 1, defaulting to 0. Your kernel may not have been built with NUMA support.
-2023-03-14 01:14:42.975450: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:272] Created TensorFlow device (/device:XPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: XPU, pci bus id: <undefined>)
-2023-03-14 01:14:42.975773: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:272] Created TensorFlow device (/device:XPU:1 with 0 MB memory) -> physical PluggableDevice (device: 1, name: XPU, pci bus id: <undefined>)
-[name: "/device:CPU:0"
-device_type: "CPU"
-memory_limit: 268435456
-locality {
-}
-incarnation: 17404753498867757733
-xla_global_id: -1
-, name: "/device:XPU:0"
-device_type: "XPU"
-locality {
-  bus_id: 1
-}
-incarnation: 14973945165464988944
-physical_device_desc: "device: 0, name: XPU, pci bus id: <undefined>"
-xla_global_id: -1
-, name: "/device:XPU:1"
-device_type: "XPU"
-locality {
-  bus_id: 1
-}
-incarnation: 8102261655652644080
-physical_device_desc: "device: 1, name: XPU, pci bus id: <undefined>"
-xla_global_id: -1
-]
-XPU test successful!
-
-===================================================
-```
-
-If you would rather not use the provided automated scripts and prefer to execute the commands manually, you can refer to this [gist](https://gist.github.com/unrahul/7813841506677fe8b3d381fd82d3385d) for more information . It provides additional explanations on some of the commands used here.
-
+4. **Documentation**: Clear and comprehensive documentation is essential for users to understand and effectively use the tool. If you find areas where the documentation can be improved or expanded, please submit your suggestions or create a pull request with your proposed changes.

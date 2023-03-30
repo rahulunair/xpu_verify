@@ -1,0 +1,24 @@
+name: Generate Documentation
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo -E apt-get update
+          sudo -E apt-get -y install python3 python3-pip
+          pip3 install --user sphinx sphinx_rtd_theme
+      - name: Build documentation
+        run: |
+          sphinx-build -b html docs/ docs/_build/
+          echo 'docs/_build/*' >> .gitignore
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
