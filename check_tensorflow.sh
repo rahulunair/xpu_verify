@@ -15,7 +15,7 @@ then
         -v /dev/dri/by-path:/dev/dri/by-path \
         --device /dev/dri \
         --privileged \
-        $IMAGE_NAME python ./workspace/tensorflow/xpu_test.py > output.txt
+        $IMAGE_NAME:IMAGE_TAG python ./workspace/tensorflow/xpu_test.py > output.txt
 
         if grep -q "XPU devices detected:" output.txt; then
             echo "Tests passed"
