@@ -44,9 +44,7 @@ echo "===================================================="
 echo ""
 
 if [ $overall_status -eq 0 ]; then
-    echo "All tests passed."
     exit 0
 else
-    echo "Some tests failed. Please check the output for more information."
     exit 1
 fi
