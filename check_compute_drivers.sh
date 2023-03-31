@@ -73,6 +73,18 @@ function check_drivers() {
   done
 }
 
+function check_dev_drivers() {
+  local driver_list=("${@}")
+
+  for driver in "${driver_list[@]}"; do
+    if is_driver_installed "$driver"; then
+      driver_version=$(get_driver_version "$driver")
+      installed_drivers+=("$driver ($driver_version)")
+    else
+      missing_dev_drivers+=("$driver")
+    fi
+  done
+}
 function print_missing_drivers() {
   if [[ ${#missing_drivers[@]} -eq 0 ]]; then
     return
@@ -104,18 +116,6 @@ function print_warning_dev_drivers() {
   echo "============================================"
 }
 
-function filter_dev_drivers() {
-  local drivers=("${@}")
-  local dev_drivers=()
-
-  for driver in "${drivers[@]}"; do
-    if [[ "$driver" =~ (dev|devel)$ ]]; then
-      dev_drivers+=("$driver")
-    else
-      non_dev_drivers+=("$driver")
-    fi
-  done
-}
 function check_os_drivers() {
   local os_runtime_drivers
   local os_devel_drivers
@@ -139,17 +139,17 @@ function check_os_drivers() {
 
   if [[ "${os_version_list[*]}" =~ "$os_version" ]]; then
     echo "Checking for required drivers on $os_name_full $os_version ..."
-
+    missing_drivers=()
     check_drivers "${os_runtime_drivers[@]}"
     print_missing_drivers
     print_installed_drivers
-
-    missing_drivers=()
-    check_drivers "${os_devel_drivers[@]}"
-    missing_dev_drivers=("${missing_drivers[@]}")
+    missing_dev_drivers=()
+    check_dev_drivers "${os_devel_drivers[@]}"
+    missing_dev_drivers=("${missing_dev_drivers[@]}")
     print_warning_dev_drivers
   else
     echo "This version of $os_name_full is not supported."
+    exit 1
   fi
 }
 
@@ -157,19 +157,7 @@ echo "Detected operating system: $os_name $os_version"
 check_os_drivers
 if [[ "${#missing_drivers[@]}" -eq 0 ]]; then
     if [[ "${#missing_dev_drivers[@]}" -gt 0 ]]; then
-        print_warning_dev_drivers
-    fi
-    exit 0
-else
-    exit 1
-fi
-
-
-echo "Detected operating system: $os_name $os_version"
-check_os_drivers
-if [[ "${#missing_drivers[@]}" -eq 0 ]]; then
-    if [[ "${#missing_dev_drivers[@]}" -gt 0 ]]; then
-        print_warning_dev_drivers
+    	exit 0
     fi
     exit 0
 else
