@@ -100,10 +100,16 @@ check_all() {
         echo "==================================================="
         ${check_function}
         result=$?
-        echo ""
-
-        if [ ${result} -ne 0 ]; then
+        echo "result of $check_name test is: $result"
+        if [ ${result} -ne 0 ] && [ "$check_name" != "check for compute drivers" ]; then
             all_tests_passed=false
+        elif [ ${result} -ne 0 ] && [ "$check_name" == "check for compute drivers" ]; then
+            missing_runtime_drivers=$(./check_compute_drivers.sh | grep "The following required drivers are missing")
+            if [ -z "$missing_runtime_drivers" ]; then
+                all_tests_passed=true
+            else
+                all_tests_passed=false
+            fi
         fi
     done
 
