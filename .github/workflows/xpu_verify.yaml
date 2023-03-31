@@ -1,0 +1,49 @@
+name: XPU Verify
+
+on:
+  workflow_dispatch:
+
+jobs:
+  xpu_verify:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: SSH and run XPU verify
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.CLOUD_HOST }}
+        username: ${{ secrets.CLOUD_USERNAME }}
+        password: ${{ secrets.CLOUD_PASSWORD }}
+        script: |
+          git clone https://github.com/rahulunair/xpu_verify
+          cd xpu_verify
+          ./xpu_verify.sh -c >> verify.log
+
+    - name: Download verify.log
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.CLOUD_HOST }}
+        username: ${{ secrets.CLOUD_USERNAME }}
+        password: ${{ secrets.CLOUD_PASSWORD }}
+        source: "xpu_verify/verify.log"
+        target: "verify.log"
+
+    - name: Download verify.log
+      uses: appleboy/scp-action@master
+      with:
+        host: 146.152.206.25
+        username: ${{ secrets.CLOUD_USERNAME }}
+        password: ${{ secrets.CLOUD_PASSWORD }}
+        source: "xpu_verify/verify.log"
+        target: "verify.log"
+
+    - name: Commit and push verify.log
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add verify.log
+        git commit -m "Add verify.log" -a || echo "No changes to commit"
+        git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/rahulunair/xpu_verify.git
+        git push
