@@ -14,7 +14,7 @@ then
         -v /dev/dri/by-path:/dev/dri/by-path \
         --device /dev/dri \
         --privileged \
-        "$IMAGE_NAME" python ./workspace/pytorch/xpu_test.py > output.txt
+        "$IMAGE_NAME:$IMAGE_TAG" python ./workspace/pytorch/xpu_test.py > output.txt
 
         if grep -q "XPU tests successful!" output.txt; then
             echo "Tests passed"
