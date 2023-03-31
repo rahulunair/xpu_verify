@@ -10,18 +10,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: SSH and run XPU verify
+     - name: SSH and run XPU verify
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.CLOUD_HOST }}
         username: ${{ secrets.CLOUD_USERNAME }}
         password: ${{ secrets.CLOUD_PASSWORD }}
         script: |
-          WORK_DIR="$HOME/xpu_verify"
+          WORK_DIR="$HOME/xpu_verify_$(date +%Y%m%d_%H%M%S)"
           git clone https://github.com/rahulunair/xpu_verify $WORK_DIR
           cd $WORK_DIR
           ./xpu_verify.sh -c >> verify.log
-          echo "LOG_PATH=$WORK_DIR/verify.log" >> $GITHUB_ENV
+          echo "LOG_PATH=$WORK_DIR/verify.log" > log_path.txt
+      id: ssh
+
+    - name: Set LOG_PATH
+      run: |
+        echo "LOG_PATH=$(echo '${{ steps.ssh.outputs.stdout }}' | tail -1 | awk -F= '{print $2}')" >> $GITHUB_ENV
+
 
     - name: Download verify.log
       uses: appleboy/scp-action@master
