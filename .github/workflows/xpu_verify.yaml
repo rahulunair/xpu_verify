@@ -17,31 +17,8 @@ jobs:
         username: ${{ secrets.CLOUD_USERNAME }}
         password: ${{ secrets.CLOUD_PASSWORD }}
         script: |
-          WORK_DIR="$HOME/xpu_verify_$(date +%Y%m%d_%H%M%S)"
-          git clone https://github.com/rahulunair/xpu_verify $WORK_DIR
-          cd $WORK_DIR
-          ./xpu_verify.sh -c >> verify.log
-          echo "LOG_PATH=$WORK_DIR/verify.log" > log_path.txt
+          rm -rf xpu_verify
+          git clone https://github.com/rahulunair/xpu_verify
+          cd xpu_verify
+          ./xpu_verify.sh -c
       id: ssh
-
-    - name: Set LOG_PATH
-      run: |
-        echo "LOG_PATH=$(echo '${{ steps.ssh.outputs.stdout }}' | tail -1 | awk -F= '{print $2}')" >> $GITHUB_ENV
-
-    - name: Download verify.log
-      uses: g00glen00b/download-file-ssh@v1.0.0
-      with:
-        host: ${{ secrets.CLOUD_HOST }}
-        username: ${{ secrets.CLOUD_USERNAME }}
-        password: ${{ secrets.CLOUD_PASSWORD }}
-        source: "${{ env.LOG_PATH }}"
-        target: "verify.log"
-
-    - name: Commit and push verify.log
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add verify.log
-        git commit -m "Add verify.log" -a || echo "No changes to commit"
-        git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/rahulunair/xpu_verify.git
-        git push
