@@ -3,6 +3,8 @@ export LIBRARY_PATH=$(dirname $(find /usr/lib /usr/lib64 -name "libstdc++.so" | 
 
 if which icpx >/dev/null 2>&1; then
   echo "icpx is in the environment"
+  echo "sleeping for 5 seconds..."
+  sleep 5
   cd ./sycl_samples/ && \
   make all > /dev/null
   build_status=$?
