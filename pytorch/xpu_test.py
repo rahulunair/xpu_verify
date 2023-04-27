@@ -105,7 +105,7 @@ def main(args):
         else:
             print("Warning: Intel XPU device is not available")
             raise Exception("Intel XPU device not detected")
-        print(colorize("XPU tests successful!", GREEN))
+        print(colorize("PyTorch XPU tests successful!", GREEN))
     except ImportError as e:
         print(colorize(f"Failed to import Intel Extension for PyTorch: {e}", RED))
     except Exception as e:
