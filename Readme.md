@@ -16,6 +16,7 @@
 
 ## Prerequisites
 
+- If you are starting from scratch and would like to setup intel dGPUs on Linux, checkout this [repo](https://github.com/rahulunair/xpu_setup). 
 - Ensure that the kernel, compute drivers, and other necessary components for Intel discrete GPUs have been set up according to the [Intel GPU documentation](https://dgpu-docs.intel.com/installation-guides/index.html).
 - To run SYCL tests, install the `intel-oneapi-compiler-dpcpp-cpp` package, which includes the oneAPI compiler. For installation instructions on Ubuntu, refer to this [link](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/apt.html), and for RHEL, SUSE, and other similar systems, refer to this [link](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/yum-dnf-zypper.html).
 - To run AI tests, Docker is required.
