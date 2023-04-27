@@ -136,7 +136,7 @@ Check if network proxy is setup, print the proxy, remove proxy settings and rest
 
 ```bash
 └❯ ./proxy_helper.sh
-
+```
 ## Contributing
 
 Contributions to improve and expand the Intel GPU sanity tests are welcome. If you are interested in contributing, please consider the following areas:
