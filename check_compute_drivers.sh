@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 os_name="$(awk -F= '/^NAME/{print $2}' /etc/os-release | tr -d '"' | tr '[:upper:]' '[:lower:]')"
 os_version="$(awk -F= '/^VERSION_ID/{print $2}' /etc/os-release | tr -d '"')"
 
-ubuntu_version_list=(20.04 22.04)
+ubuntu_version_list=(20.04 22.04 23.04)
 ubuntu_runtime_drivers=(
   "intel-level-zero-gpu"
   "intel-opencl-icd"
